@@ -10,9 +10,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import fdi.ucm.server.modelComplete.collection.CompleteCollection;
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
 import fdi.ucm.server.modelComplete.collection.document.CompleteElement;
@@ -51,24 +48,6 @@ public class CollectionSQL implements InterfaceSQLparser {
 	
 	private static enum Controlado {SET};
 	
-	private static final String PATTERN_EMAIL = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-            + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
- 
-    /**
-     * Validate given email with regular expression.
-     * 
-     * @param email
-     *            email for validation
-     * @return true valid email, otherwise false
-     */
-    public static boolean validateEmail(String email) {
- 
-        Pattern pattern = Pattern.compile(PATTERN_EMAIL);
- 
-        Matcher matcher = pattern.matcher(email);
-        return matcher.matches();
- 
-    }
 
 	private MySQLConnectionMySQL MySQL;
 	
@@ -359,7 +338,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 					try {
 						int I =Integer.parseInt(numberasoc);
 						I++;
-						CompleteOperationalValueType ValorResult2=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,Integer.toString(I),vistaOV);
+						CompleteOperationalValueType ValorResult2=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN2,Integer.toString(I),vistaOV);
 						vistaOV.getValues().add(ValorResult2);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -408,7 +387,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 				if (numberasoc!=null&&!numberasoc.isEmpty())
 				{
 				try {
-					CompleteOperationalValueType ValorResult2=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,numberasoc,vistaOV);
+					CompleteOperationalValueType ValorResult2=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN2,numberasoc,vistaOV);
 					vistaOV.getValues().add(ValorResult2);
 				} catch (Exception e) {
 					e.printStackTrace();

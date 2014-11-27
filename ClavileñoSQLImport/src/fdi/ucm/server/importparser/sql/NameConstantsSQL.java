@@ -17,6 +17,7 @@ public class NameConstantsSQL {
 	public static final String COLUMNA = "Column";
 	
 	public static final String TYPECOLUMN= "Column Type ";
+	public static String TYPECOLUMN2="Type Limits" ;
 	
 	public static final String KEY = "KEY";
 	
@@ -31,5 +32,6 @@ public class NameConstantsSQL {
 	
 	public static final String VOCABULARY = "Vocabulary";
 	public static final String TERM = "Term";
+	
 
 }
