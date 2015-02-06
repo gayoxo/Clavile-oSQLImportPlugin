@@ -10,6 +10,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+
 import fdi.ucm.server.modelComplete.collection.CompleteCollection;
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
 import fdi.ucm.server.modelComplete.collection.document.CompleteElement;
@@ -50,6 +52,8 @@ public class CollectionSQL implements InterfaceSQLparser {
 	
 
 	private MySQLConnectionMySQL MySQL;
+	private HashMap<String, HashMap<String, Integer>> ClaveClaves;
+	private int Contadordetablas;
 	
 	public CollectionSQL() {
 		coleccionstatica=new CompleteCollection(SQL_COLLECTION, COLECCION_A_APARTIR_DE_UN_SQL+ new Timestamp(new Date().getTime()));
@@ -61,6 +65,8 @@ public class CollectionSQL implements InterfaceSQLparser {
 	@Override
 	public void ProcessAttributes() {
 		try {
+			ClaveClaves=new HashMap<String, HashMap<String, Integer>>();
+			Contadordetablas=0;
 			ResultSet rs=MySQL.getTables();
 			if (rs!=null) 
 			{
@@ -69,7 +75,10 @@ public class CollectionSQL implements InterfaceSQLparser {
 					   String tabla = rs.getString(3);
 					   CompleteGrammar M=new CompleteGrammar(tabla, tabla,coleccionstatica);
 					   
-						CompleteOperationalView VistaOV=new CompleteOperationalView(NameConstantsSQL.SQL);
+					   if (ClaveClaves.get(tabla)==null)
+						   ClaveClaves.put(tabla, new HashMap<String, Integer>());
+						
+					   CompleteOperationalView VistaOV=new CompleteOperationalView(NameConstantsSQL.SQL);
 						CompleteOperationalValueType Valor=new CompleteOperationalValueType(NameConstantsSQL.SQLType,NameConstantsSQL.TABLA,VistaOV);
 						VistaOV.getValues().add(Valor);
 						M.getViews().add(VistaOV);
@@ -280,11 +289,18 @@ public class CollectionSQL implements InterfaceSQLparser {
 	private ArrayList<CompleteElementType> procesaColumnas(String catalogo, String tabla, CompleteGrammar padre) {
 		ArrayList<CompleteElementType> Salida =new ArrayList<CompleteElementType>();
 		try {
-			ArrayList<String> Keys=new ArrayList<String>();
+			HashMap<String,KeyElement> Keys=new HashMap<String,KeyElement>();
+			
 			ResultSet rsKey= MySQL.getKey(catalogo, tabla);
 			if (rsKey!=null)
 				while (rsKey.next())
-					Keys.add(rsKey.getString("COLUMN_NAME"));
+					{
+					String Nombrecolumna = rsKey.getString("COLUMN_NAME");
+					String NombreTabla = rsKey.getString("TABLE_NAME");
+					String PKName = rsKey.getString("PK_NAME");
+					Keys.put(Nombrecolumna,new KeyElement(NombreTabla,Nombrecolumna,PKName));
+					
+					}
 					
 			ResultSet rs=MySQL.getColums(catalogo, tabla);
 			if (rs!=null) 
@@ -293,12 +309,63 @@ public class CollectionSQL implements InterfaceSQLparser {
 					   String nombreColumna = rs.getString(4);
 					   String tipoColumna = rs.getString(6); 
 					   String numberasoc = rs.getString(7); 
+					   
+					   KeyElement elem=Keys.get(nombreColumna);
+					   
 					   CompleteOperationalView VistaOV=new CompleteOperationalView(NameConstantsSQL.SQL);
 						CompleteOperationalValueType Valor=new CompleteOperationalValueType(NameConstantsSQL.SQLType,NameConstantsSQL.COLUMNA,VistaOV);
-						CompleteOperationalValueType Valor2=new CompleteOperationalValueType(NameConstantsSQL.KEY,Boolean.toString(Keys.contains(nombreColumna)),VistaOV);
 						VistaOV.getValues().add(Valor);
-						VistaOV.getValues().add(Valor2);
-	
+						
+						CompleteOperationalValueType ValorInt=new CompleteOperationalValueType(NameConstantsSQL.COLUMNIDKEY,Integer.toString(Contadordetablas),VistaOV);
+						
+						HashMap<String, Integer> Lista = ClaveClaves.get(tabla);
+						Integer A=Lista.get(nombreColumna);
+						if (A!=null)
+							ValorInt=new CompleteOperationalValueType(NameConstantsSQL.COLUMNIDKEY,Integer.toString(A.intValue()),VistaOV);
+						else
+							{
+							Lista.put(nombreColumna, Contadordetablas);
+							ClaveClaves.put(tabla, Lista);
+							Contadordetablas++;
+							}
+						
+						VistaOV.getValues().add(ValorInt);
+						
+						
+						
+						//TODO AQUI PAsAN COSAS
+						
+						if (elem!=null)
+							{
+							CompleteOperationalValueType Valor2=new CompleteOperationalValueType(NameConstantsSQL.KEY,Boolean.toString(true),VistaOV);
+							VistaOV.getValues().add(Valor2);
+							CompleteOperationalValueType Valor3=new CompleteOperationalValueType(NameConstantsSQL.KEYLEVEL,elem.getPKName(),VistaOV);
+							VistaOV.getValues().add(Valor3);
+							if (!tabla.equals(elem.getNombreTabla()))
+								{
+								CompleteOperationalValueType Valor4=new CompleteOperationalValueType(NameConstantsSQL.FOREINGCOLUMNNAME,elem.getNombreTabla(),VistaOV);
+								VistaOV.getValues().add(Valor4);
+								
+								HashMap<String, Integer> Lista2 = ClaveClaves.get(elem.getNombreTabla());
+								
+								if (Lista2==null)
+									Lista2=new HashMap<String, Integer>();
+								
+								Integer ValorColumnaId = Lista2.get(elem.getNombreColumna());
+								if (ValorColumnaId==null)
+									{
+									ValorColumnaId=new Integer(Contadordetablas);
+									Lista2.put(nombreColumna, Contadordetablas);
+									ClaveClaves.put(elem.getNombreTabla(), Lista2);
+									Contadordetablas++;
+									}
+								
+								
+								
+								CompleteOperationalValueType Valor5=new CompleteOperationalValueType(NameConstantsSQL.FOREINGCOLUMNIDKEY,Integer.toString(ValorColumnaId),VistaOV);
+								VistaOV.getValues().add(Valor5);
+								}
+							}
 						
 					   CompleteElementType M=generaMeta(nombreColumna,tipoColumna,padre,VistaOV,tabla,numberasoc);
 						
@@ -312,6 +379,10 @@ public class CollectionSQL implements InterfaceSQLparser {
 			rs.close();
 			
 			}
+			
+			
+			
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

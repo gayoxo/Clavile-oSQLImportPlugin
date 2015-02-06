@@ -32,6 +32,10 @@ public class NameConstantsSQL {
 	
 	public static final String VOCABULARY = "Vocabulary";
 	public static final String TERM = "Term";
+	public static final String COLUMNIDKEY = "Column Id Key";
+	public static final String KEYLEVEL = "Key Level";
+	public static final String FOREINGCOLUMNNAME = "Foreing Column Name";
+	public static final String FOREINGCOLUMNIDKEY = "Foreing Column Id Key";
 	
 
 }
