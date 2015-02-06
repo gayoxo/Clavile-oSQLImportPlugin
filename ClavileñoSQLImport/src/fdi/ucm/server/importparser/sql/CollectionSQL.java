@@ -306,9 +306,12 @@ public class CollectionSQL implements InterfaceSQLparser {
 			if (rs!=null) 
 			{
 				while (rs.next()) {
-					   String nombreColumna = rs.getString(4);
-					   String tipoColumna = rs.getString(6); 
-					   String numberasoc = rs.getString(7); 
+					   String nombreColumna = rs.getString("COLUMN_NAME");
+					   String tipoColumna = rs.getString("TYPE_NAME"); 
+					   String numberasoc = rs.getString("COLUMN_SIZE");
+					   String isNulable = rs.getString("IS_NULLABLE");
+					   String isAutoIcrement =rs.getString("IS_AUTOINCREMENT");
+					   String isGenerated=rs.getString("IS_GENERATEDCOLUMN");
 					   
 					   KeyElement elem=Keys.get(nombreColumna);
 					   
@@ -331,9 +334,24 @@ public class CollectionSQL implements InterfaceSQLparser {
 						
 						VistaOV.getValues().add(ValorInt);
 						
+						if (!isNulable.isEmpty())
+						{
+							CompleteOperationalValueType ValorN=new CompleteOperationalValueType(NameConstantsSQL.ISNULLABE,isNulable,VistaOV);
+							VistaOV.getValues().add(ValorN);
+						}
 						
+						if (!isAutoIcrement.isEmpty())
+						{
+							CompleteOperationalValueType ValorN=new CompleteOperationalValueType(NameConstantsSQL.AUTO_INCREMENT,isAutoIcrement,VistaOV);
+							VistaOV.getValues().add(ValorN);
+						}
 						
-						//TODO AQUI PAsAN COSAS
+						if (!isGenerated.isEmpty())
+						{
+							CompleteOperationalValueType ValorN=new CompleteOperationalValueType(NameConstantsSQL.ISGENERATED,isGenerated,VistaOV);
+							VistaOV.getValues().add(ValorN);
+						}
+						
 						
 						if (elem!=null)
 							{

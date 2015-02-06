@@ -36,6 +36,9 @@ public class NameConstantsSQL {
 	public static final String KEYLEVEL = "Key Level";
 	public static final String FOREINGCOLUMNNAME = "Foreing Column Name";
 	public static final String FOREINGCOLUMNIDKEY = "Foreing Column Id Key";
+	public static final String ISNULLABE = "Is Nullable";
+	public static final String AUTO_INCREMENT = "Auto-Increment";
+	public static final String ISGENERATED = "Is Generated";
 	
 
 }
