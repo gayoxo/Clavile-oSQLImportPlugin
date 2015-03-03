@@ -311,7 +311,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 					   String numberasoc = rs.getString("COLUMN_SIZE");
 					   String isNulable = rs.getString("IS_NULLABLE");
 					   String isAutoIcrement =rs.getString("IS_AUTOINCREMENT");
-					   String isGenerated=rs.getString("IS_GENERATEDCOLUMN");
+//					   String isGenerated=rs.getString("IS_GENERATEDCOLUMN");
 					   
 					   KeyElement elem=Keys.get(nombreColumna);
 					   
@@ -346,11 +346,11 @@ public class CollectionSQL implements InterfaceSQLparser {
 							VistaOV.getValues().add(ValorN);
 						}
 						
-						if (!isGenerated.isEmpty())
-						{
-							CompleteOperationalValueType ValorN=new CompleteOperationalValueType(NameConstantsSQL.ISGENERATED,isGenerated,VistaOV);
-							VistaOV.getValues().add(ValorN);
-						}
+//						if (!isGenerated.isEmpty())
+//						{
+//							CompleteOperationalValueType ValorN=new CompleteOperationalValueType(NameConstantsSQL.ISGENERATED,isGenerated,VistaOV);
+//							VistaOV.getValues().add(ValorN);
+//						}
 						
 						
 						if (elem!=null)
@@ -403,6 +403,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		
 		return Salida;
