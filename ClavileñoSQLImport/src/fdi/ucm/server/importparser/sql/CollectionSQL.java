@@ -19,7 +19,6 @@ import fdi.ucm.server.modelComplete.collection.document.CompleteTextElement;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteOperationalValueType;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteOperationalView;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
 
 /**
@@ -78,10 +77,9 @@ public class CollectionSQL implements InterfaceSQLparser {
 					   if (ClaveClaves.get(tabla)==null)
 						   ClaveClaves.put(tabla, new HashMap<String, Integer>());
 						
-					   CompleteOperationalView VistaOV=new CompleteOperationalView(NameConstantsSQL.SQL);
+					   String VistaOV=new String(NameConstantsSQL.SQL);
 						CompleteOperationalValueType Valor=new CompleteOperationalValueType(NameConstantsSQL.SQLType,NameConstantsSQL.TABLA,VistaOV);
-						VistaOV.getValues().add(Valor);
-						M.getViews().add(VistaOV);
+						M.getViews().add(Valor);
 
 						
 					   coleccionstatica.getMetamodelGrammar().add(M);
@@ -162,16 +160,14 @@ public class CollectionSQL implements InterfaceSQLparser {
 
 	//Test si un elemento es fecha
 	private boolean isDate(CompleteTextElementType completeTextElementType) {
-		ArrayList<CompleteOperationalView> Shows = completeTextElementType.getShows();
-		for (CompleteOperationalView show : Shows) {	
-			if (show.getName().equals(NameConstantsSQL.METATYPE))
+		ArrayList<CompleteOperationalValueType> Shows = completeTextElementType.getShows();
+		for (CompleteOperationalValueType show : Shows) {	
+			if (show.getView().equals(NameConstantsSQL.METATYPE))
 			{
-				ArrayList<CompleteOperationalValueType> ShowValue = show.getValues();
-				for (CompleteOperationalValueType showValues : ShowValue) {
-					if (showValues.getName().equals(NameConstantsSQL.METATYPETYPE))
-							if (showValues.getDefault().equals(NameConstantsSQL.DATE)) 
+
+					if (show.getName().equals(NameConstantsSQL.METATYPETYPE))
+							if (show.getDefault().equals(NameConstantsSQL.DATE)) 
 										return true;
-				}
 			}
 		}
 		return false;
@@ -270,12 +266,10 @@ public class CollectionSQL implements InterfaceSQLparser {
 	 * @return
 	 */
 	private String DameTipoDate(CompleteTextElementType meta) {
-		for (CompleteOperationalView show1 : meta.getShows()) {
-			if (show1.getName().equals(NameConstantsSQL.SQL))
-				for (CompleteOperationalValueType show1value : show1.getValues()) {
-					if (show1value.getName().equals(NameConstantsSQL.TYPECOLUMN))
-						return show1value.getDefault();
-				}
+		for (CompleteOperationalValueType show1 : meta.getShows()) {
+			if (show1.getView().equals(NameConstantsSQL.SQL))
+					if (show1.getName().equals(NameConstantsSQL.TYPECOLUMN))
+						return show1.getDefault();
 		}
 		return null;
 	}
@@ -314,10 +308,14 @@ public class CollectionSQL implements InterfaceSQLparser {
 //					   String isGenerated=rs.getString("IS_GENERATEDCOLUMN");
 					   
 					   KeyElement elem=Keys.get(nombreColumna);
+					   String VistaOV=new String(NameConstantsSQL.SQL);
 					   
-					   CompleteOperationalView VistaOV=new CompleteOperationalView(NameConstantsSQL.SQL);
+					   
+					   CompleteElementType M=generaMeta(nombreColumna,tipoColumna,padre,VistaOV,tabla,numberasoc);
+					   
+					  
 						CompleteOperationalValueType Valor=new CompleteOperationalValueType(NameConstantsSQL.SQLType,NameConstantsSQL.COLUMNA,VistaOV);
-						VistaOV.getValues().add(Valor);
+						M.getShows().add(Valor);
 						
 						CompleteOperationalValueType ValorInt=new CompleteOperationalValueType(NameConstantsSQL.COLUMNIDKEY,Integer.toString(Contadordetablas),VistaOV);
 						
@@ -332,37 +330,37 @@ public class CollectionSQL implements InterfaceSQLparser {
 							Contadordetablas++;
 							}
 						
-						VistaOV.getValues().add(ValorInt);
+						M.getShows().add(ValorInt);
 						
 						if (!isNulable.isEmpty())
 						{
 							CompleteOperationalValueType ValorN=new CompleteOperationalValueType(NameConstantsSQL.ISNULLABE,isNulable,VistaOV);
-							VistaOV.getValues().add(ValorN);
+							M.getShows().add(ValorN);
 						}
 						
 						if (!isAutoIcrement.isEmpty())
 						{
 							CompleteOperationalValueType ValorN=new CompleteOperationalValueType(NameConstantsSQL.AUTO_INCREMENT,isAutoIcrement,VistaOV);
-							VistaOV.getValues().add(ValorN);
+							M.getShows().add(ValorN);
 						}
 						
 //						if (!isGenerated.isEmpty())
 //						{
 //							CompleteOperationalValueType ValorN=new CompleteOperationalValueType(NameConstantsSQL.ISGENERATED,isGenerated,VistaOV);
-//							VistaOV.getValues().add(ValorN);
+//							M.getShows().add(ValorN);
 //						}
 						
 						
 						if (elem!=null)
 							{
 							CompleteOperationalValueType Valor2=new CompleteOperationalValueType(NameConstantsSQL.KEY,Boolean.toString(true),VistaOV);
-							VistaOV.getValues().add(Valor2);
+							M.getShows().add(Valor2);
 							CompleteOperationalValueType Valor3=new CompleteOperationalValueType(NameConstantsSQL.KEYLEVEL,elem.getPKName(),VistaOV);
-							VistaOV.getValues().add(Valor3);
+							M.getShows().add(Valor3);
 							if (!tabla.equals(elem.getNombreTabla()))
 								{
 								CompleteOperationalValueType Valor4=new CompleteOperationalValueType(NameConstantsSQL.FOREINGCOLUMNNAME,elem.getNombreTabla(),VistaOV);
-								VistaOV.getValues().add(Valor4);
+								M.getShows().add(Valor4);
 								
 								HashMap<String, Integer> Lista2 = ClaveClaves.get(elem.getNombreTabla());
 								
@@ -381,14 +379,13 @@ public class CollectionSQL implements InterfaceSQLparser {
 								
 								
 								CompleteOperationalValueType Valor5=new CompleteOperationalValueType(NameConstantsSQL.FOREINGCOLUMNIDKEY,Integer.toString(ValorColumnaId),VistaOV);
-								VistaOV.getValues().add(Valor5);
+								M.getShows().add(Valor5);
 								}
 							}
 						
-					   CompleteElementType M=generaMeta(nombreColumna,tipoColumna,padre,VistaOV,tabla,numberasoc);
+					   
 						
-						
-						M.getShows().add(VistaOV);
+
 						
 					   padre.getSons().add(M);
 					   Salida.add(M);
@@ -410,7 +407,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 		
 	}
 
-	private CompleteElementType generaMeta(String nombreColumna, String tipoColumna, CompleteGrammar padre, CompleteOperationalView vistaOV,String tabla, String numberasoc) {
+	private CompleteElementType generaMeta(String nombreColumna, String tipoColumna, CompleteGrammar padre, String vistaOV,String tabla, String numberasoc) {
 		
 		
 		
@@ -421,27 +418,30 @@ public class CollectionSQL implements InterfaceSQLparser {
 		for (Numbers valornumerico : Numbers.values()) {
 			if (tipoColumna.startsWith(valornumerico.toString()))
 			{
-				CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,valornumerico.toString(),vistaOV);
-				vistaOV.getValues().add(ValorResult);
-				if (numberasoc!=null&&!numberasoc.isEmpty())
-					{
-					try {
-						int I =Integer.parseInt(numberasoc);
-						I++;
-						CompleteOperationalValueType ValorResult2=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN2,Integer.toString(I),vistaOV);
-						vistaOV.getValues().add(ValorResult2);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					
-					}
+				
 				
 				 CompleteTextElementType Salida=new CompleteTextElementType(nombreColumna,padre); 
 				
-				 CompleteOperationalView VistaOV2=new CompleteOperationalView(NameConstantsSQL.METATYPE);
+				 String VistaOV2=new String(NameConstantsSQL.METATYPE);
 				 CompleteOperationalValueType Valor=new CompleteOperationalValueType(NameConstantsSQL.METATYPETYPE,NameConstantsSQL.NUMERIC,VistaOV2);
-				 VistaOV2.getValues().add(Valor);
-				 Salida.getShows().add(VistaOV2);
+				 Salida.getShows().add(Valor);
+
+				 
+				 CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,valornumerico.toString(),vistaOV);
+				 Salida.getShows().add(ValorResult);
+					if (numberasoc!=null&&!numberasoc.isEmpty())
+						{
+						try {
+							int I =Integer.parseInt(numberasoc);
+							I++;
+							CompleteOperationalValueType ValorResult2=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN2,Integer.toString(I),vistaOV);
+							Salida.getShows().add(ValorResult2);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
+						}
+				 
 				 
 				return Salida;
 			}
@@ -450,16 +450,19 @@ public class CollectionSQL implements InterfaceSQLparser {
 		for (Fecha valornumerico : Fecha.values()) {
 			if (tipoColumna.startsWith(valornumerico.toString()))
 				{
-				CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,valornumerico.toString(),vistaOV);
-				vistaOV.getValues().add(ValorResult);
+				
 				
 				
 				CompleteTextElementType Salida=new CompleteTextElementType(nombreColumna,padre); 
 				
-				CompleteOperationalView VistaOV2=new CompleteOperationalView(NameConstantsSQL.METATYPE);
+				String VistaOV2=new String(NameConstantsSQL.METATYPE);
 				CompleteOperationalValueType Valor=new CompleteOperationalValueType(NameConstantsSQL.METATYPETYPE,NameConstantsSQL.DATE,VistaOV2);
-				VistaOV2.getValues().add(Valor);
-				Salida.getShows().add(VistaOV2);
+				Salida.getShows().add(Valor);
+						
+				
+				CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,valornumerico.toString(),vistaOV);
+				Salida.getShows().add(ValorResult);
+				
 				
 				return Salida;
 				}
@@ -471,26 +474,32 @@ public class CollectionSQL implements InterfaceSQLparser {
 				{
 
 				
-				CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,valornumerico.toString(),vistaOV);
-				vistaOV.getValues().add(ValorResult);
 				
-				if (numberasoc!=null&&!numberasoc.isEmpty())
-				{
-				try {
-					CompleteOperationalValueType ValorResult2=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN2,numberasoc,vistaOV);
-					vistaOV.getValues().add(ValorResult2);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-				}
 					CompleteTextElementType Salida=new CompleteTextElementType(nombreColumna,padre); 
 				
-					CompleteOperationalView VistaOV2=new CompleteOperationalView(NameConstantsSQL.METATYPE);
+					String VistaOV2=new String(NameConstantsSQL.METATYPE);
 					CompleteOperationalValueType Valor=new CompleteOperationalValueType(NameConstantsSQL.METATYPETYPE,NameConstantsSQL.TEXT,VistaOV2);
-					VistaOV2.getValues().add(Valor);
-					Salida.getShows().add(VistaOV2);
+					Salida.getShows().add(Valor);
 				 
+					
+					
+					CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,valornumerico.toString(),vistaOV);
+					Salida.getShows().add(ValorResult);
+					
+					if (numberasoc!=null&&!numberasoc.isEmpty())
+					{
+					try {
+						CompleteOperationalValueType ValorResult2=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN2,numberasoc,vistaOV);
+						Salida.getShows().add(ValorResult2);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					}
+					
+					
+					
+					
 					return Salida;
 				}
 		}
@@ -498,15 +507,16 @@ public class CollectionSQL implements InterfaceSQLparser {
 		for (Booleanos valornumerico : Booleanos.values()) {
 			if (tipoColumna.startsWith(valornumerico.toString()))
 				{
-				CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,valornumerico.toString(),vistaOV);
-				vistaOV.getValues().add(ValorResult);
+				
 				
 				CompleteTextElementType Salida=new CompleteTextElementType(nombreColumna,padre); 
 				
-				CompleteOperationalView VistaOV2=new CompleteOperationalView(NameConstantsSQL.METATYPE);
+				String VistaOV2=new String(NameConstantsSQL.METATYPE);
 				CompleteOperationalValueType Valor=new CompleteOperationalValueType(NameConstantsSQL.METATYPETYPE,NameConstantsSQL.BOOLEAN,VistaOV2);
-				VistaOV2.getValues().add(Valor);
-				Salida.getShows().add(VistaOV2);
+				Salida.getShows().add(Valor);
+				
+				CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,valornumerico.toString(),vistaOV);
+				Salida.getShows().add(ValorResult);
 				
 				return Salida;
 				}
@@ -515,34 +525,37 @@ public class CollectionSQL implements InterfaceSQLparser {
 		for (Controlado valornumerico : Controlado.values()) {
 			if (tipoColumna.startsWith(valornumerico.toString()))
 				{
-				CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,valornumerico.toString(),vistaOV);
-				vistaOV.getValues().add(ValorResult);
+				
 				CompleteTextElementType Salida=new CompleteTextElementType(nombreColumna, padre);
 				
 				
 				ArrayList<String> V= generaVocabulary(nombreColumna,tabla);
 				
-				CompleteOperationalView VistaOV2=new CompleteOperationalView(NameConstantsSQL.METATYPE);
+				String VistaOV2=new String(NameConstantsSQL.METATYPE);
 				CompleteOperationalValueType Valor=new CompleteOperationalValueType(NameConstantsSQL.METATYPETYPE,NameConstantsSQL.CONTROLED,VistaOV2);
-				VistaOV2.getValues().add(Valor);
-				Salida.getShows().add(VistaOV2);
+				Salida.getShows().add(Valor);
 				
 				
-				CompleteOperationalView VistaVOC=new CompleteOperationalView(NameConstantsSQL.VOCABULARY);
+				String VistaVOC=new String(NameConstantsSQL.VOCABULARY);
 				for (String Termino : V) {
 					CompleteOperationalValueType ValorTerm=new CompleteOperationalValueType(NameConstantsSQL.TERM,Termino,VistaVOC);
-					VistaVOC.getValues().add(ValorTerm);
+					Salida.getShows().add(ValorTerm);
 				}
-				Salida.getShows().add(VistaVOC);
+
+				CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,valornumerico.toString(),vistaOV);
+				Salida.getShows().add(ValorResult);
 				
 
 				return Salida;
 				}
 		}
 		
+		CompleteElementType Salida = new CompleteElementType(nombreColumna, padre);
+		
 		CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,tipoColumna.toString(),vistaOV);
-		vistaOV.getValues().add(ValorResult);
-		return new CompleteElementType(nombreColumna, padre);
+		Salida.getShows().add(ValorResult);
+		
+		return Salida; 
 	}
 
 	/**
