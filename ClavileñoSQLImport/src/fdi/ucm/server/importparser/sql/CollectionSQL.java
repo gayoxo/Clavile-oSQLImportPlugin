@@ -108,7 +108,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 			{
 				while (rs.next()) {
 					
-					CompleteDocuments DocumentosC=new CompleteDocuments(coleccionstatica,Documento,"Columna","");
+					CompleteDocuments DocumentosC=new CompleteDocuments(coleccionstatica,"Columna","");
 					for (CompleteElementType completeElementType : metaColumnas) {
 						Object O=null;
 						try {
