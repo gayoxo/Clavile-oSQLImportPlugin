@@ -49,6 +49,9 @@ public class CollectionSQLInfering extends CollectionSQL {
 		
 	}
 
+
+	private Boolean RelationsPublicPrivate;
+
 	public CollectionSQLInfering() {
 		super();
 	}
@@ -136,6 +139,13 @@ public class CollectionSQLInfering extends CollectionSQL {
 					String Source = nuevaString.toString();
 					
 					StringBuffer nuevaString2=new StringBuffer();
+					if (RelationsPublicPrivate&&
+							((palabras[0].toLowerCase().equals("public")||palabras[0].toLowerCase().equals("private"))
+							||
+							(palabras[0].toLowerCase().equals("publicos")||palabras[0].toLowerCase().equals("privados")))
+							)
+						nuevaString2.append(palabras[0]);
+					
 					for (int i = posi+1; i < palabras.length; i++) {
 						if (nuevaString2.length()>0)
 							nuevaString2.append("_");
@@ -230,6 +240,12 @@ public class CollectionSQLInfering extends CollectionSQL {
 			e.printStackTrace();
 		}
 
+		
+	}
+
+
+	public void publicPrivateAtribute(Boolean relationsPublicPrivate) {
+		RelationsPublicPrivate=relationsPublicPrivate;
 		
 	}
 }
