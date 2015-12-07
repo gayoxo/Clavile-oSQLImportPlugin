@@ -29,11 +29,11 @@ import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
  */
 public class CollectionSQL implements InterfaceSQLparser {
 
-	private static final String COLECCION_A_APARTIR_DE_UN_SQL = "Coleccion a apartir de un SQL : ";
-	private static final String SQL_COLLECTION = "SQL Collection";
-	private CompleteCollection coleccionstatica;
-	private static enum Numbers {TINYINT, SMALLINT, MEDIUMINT, INT, BIGINT, DECIMAL,DEC,FLOAT,DOUBLE};
-	private static enum Fecha {DATETIME,
+	protected static final String COLECCION_A_APARTIR_DE_UN_SQL = "Coleccion a apartir de un SQL : ";
+	protected static final String SQL_COLLECTION = "SQL Collection";
+	protected CompleteCollection coleccionstatica;
+	protected static enum Numbers {TINYINT, SMALLINT, MEDIUMINT, INT, BIGINT, DECIMAL,DEC,FLOAT,DOUBLE};
+	protected static enum Fecha {DATETIME,
 		//'0000-00-00 00:00:00'
 							   DATE,
 		//'0000-00-00'
@@ -44,19 +44,21 @@ public class CollectionSQL implements InterfaceSQLparser {
 							   YEAR
 	};
 	
-	private static enum Texto {CHAR, VARCHAR, BINARY, VARBINARY, BLOB, TEXT, ENUM,LONGTEXT};
+	protected static enum Texto {CHAR, VARCHAR, BINARY, VARBINARY, BLOB, TEXT, ENUM,LONGTEXT};
 	
-	private static enum Booleanos {TINYINT,BOOL,BOOLEAN,BIT};
+	protected static enum Booleanos {TINYINT,BOOL,BOOLEAN,BIT};
 	
-	private static enum Controlado {SET};
+	protected static enum Controlado {SET};
 	
 
-	private MySQLConnectionMySQL MySQL;
-	private HashMap<String, HashMap<String, Integer>> ClaveClaves;
-	private int Contadordetablas;
+	protected MySQLConnectionMySQL MySQL;
+	protected HashMap<String, HashMap<String, Integer>> ClaveClaves;
+	protected int Contadordetablas;
+	protected HashMap<CompleteGrammar,HashMap<String, CompleteDocuments>> TablaEquivalDocu;
 	
 	public CollectionSQL() {
 		coleccionstatica=new CompleteCollection(SQL_COLLECTION, COLECCION_A_APARTIR_DE_UN_SQL+ new Timestamp(new Date().getTime()));
+		TablaEquivalDocu=new HashMap<CompleteGrammar, HashMap<String,CompleteDocuments>>();
 	}
 	
 	/* (non-Javadoc)
@@ -103,12 +105,15 @@ public class CollectionSQL implements InterfaceSQLparser {
 	 * @param metaColumnas 
 	 * @param Documento 
 	 */
-	private void procesaColumnasInstancia(String catalogo, String tabla, ArrayList<CompleteElementType> metaColumnas, CompleteGrammar Documento) {
+	protected void procesaColumnasInstancia(String catalogo, String tabla, ArrayList<CompleteElementType> metaColumnas, CompleteGrammar Documento) {
 		try {
 			ResultSet rs=MySQL.RunQuerrySELECT("SELECT * FROM "+ tabla +";");
 			if (rs!=null) 
 			{
+				
 				while (rs.next()) {
+					
+					String ID=rs.getString(1);
 					
 					CompleteDocuments DocumentosC=new CompleteDocuments(coleccionstatica,Documento,"Columna","");
 					for (CompleteElementType completeElementType : metaColumnas) {
@@ -133,7 +138,15 @@ public class CollectionSQL implements InterfaceSQLparser {
 							}
 					}
 					if (DocumentosC.getDescription().size()>0)
+						{
 						coleccionstatica.getEstructuras().add(DocumentosC);
+						HashMap<String, CompleteDocuments> TablaElem = TablaEquivalDocu.get(Documento);
+						if (TablaElem==null)
+							TablaElem=new HashMap<String, CompleteDocuments>();
+						TablaElem.put(ID,DocumentosC);
+						TablaEquivalDocu.put(Documento, TablaElem);
+						}
+					
 					
 				
 				}
@@ -286,7 +299,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 	 * @param tabla
 	 * @param padre
 	 */
-	private ArrayList<CompleteElementType> procesaColumnas(String catalogo, String tabla, CompleteGrammar padre) {
+	protected ArrayList<CompleteElementType> procesaColumnas(String catalogo, String tabla, CompleteGrammar padre) {
 		ArrayList<CompleteElementType> Salida =new ArrayList<CompleteElementType>();
 		try {
 			HashMap<String,KeyElement> Keys=new HashMap<String,KeyElement>();

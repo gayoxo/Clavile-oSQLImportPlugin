@@ -24,29 +24,32 @@ public class LoadCollectionSQL extends LoadCollection {
 		super();
 	}
 	
-	
-	protected void setConfiguracion(ArrayList<String> DateEntrada) {
-		
-
-	}
 
 	/* (non-Javadoc)
 	 * @see fdi.ucm.server.LoadCollection#processCollecccion()
 	 */
 	@Override
 	public CompleteCollectionAndLog processCollecccion(ArrayList<String> DateEntrada) {
-		CollectionSQL SQLparser= new CollectionSQL();
+		CollectionSQL SQLparser= new CollectionSQL();;
 		ArrayList<String> Log=new ArrayList<String>();
 		if (DateEntrada!=null)
 			
 		{
 			String Database = RemoveSpecialCharacters(DateEntrada.get(1));
 			MySQLConnectionMySQL SQL= MySQLConnectionMySQL.getInstance(DateEntrada.get(0),Database,Integer.parseInt(DateEntrada.get(2)),DateEntrada.get(3),DateEntrada.get(4));
-
-		setConfiguracion(DateEntrada);
-
-		SQLparser.setMySQLInstance(SQL);
-		SQLparser.ProcessAttributes();
+			Boolean inferRelations=false;
+			
+			try {
+				inferRelations=Boolean.parseBoolean(DateEntrada.get(5));
+			} catch (Exception e) {
+				
+			}
+		
+			if (inferRelations)
+				SQLparser= new CollectionSQLInfering();
+			
+			SQLparser.setMySQLInstance(SQL);
+			SQLparser.ProcessAttributes();
 		}
 		else 
 		{
@@ -69,6 +72,7 @@ public class LoadCollectionSQL extends LoadCollection {
 			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.Number, "MySQL Port"));
 			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.Text, "MySQL User"));
 			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.EncriptedText, "MySQL Password"));
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.Boolean, "Infiering Relations (A_B)"));
 			Parametros=ListaCampos;
 			return ListaCampos;
 		}
