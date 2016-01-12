@@ -11,10 +11,10 @@ import java.util.HashSet;
 
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
 import fdi.ucm.server.modelComplete.collection.document.CompleteLinkElement;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteLinkElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteOperationalValueType;
+import fdi.ucm.server.modelComplete.collection.grammar.CompleteStructure;
 
 /**
  * @author Joaquin Gayoso-Cabada
@@ -113,7 +113,7 @@ public class CollectionSQLInfering extends CollectionSQL {
 
 						
 					   coleccionstatica.getMetamodelGrammar().add(M);
-					   ArrayList<CompleteElementType> MetaColumnas=procesaColumnas(catalogo,tabla,M);
+					   ArrayList<CompleteStructure> MetaColumnas=procesaColumnas(catalogo,tabla,M);
 					   procesaColumnasInstancia(catalogo,tabla,MetaColumnas,M);
 					   
 					   GramaticasBase.put(tabla, M);
