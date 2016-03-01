@@ -16,9 +16,9 @@ import fdi.ucm.server.modelComplete.collection.CompleteCollection;
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
 import fdi.ucm.server.modelComplete.collection.document.CompleteElement;
 import fdi.ucm.server.modelComplete.collection.document.CompleteTextElement;
+import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteOperationalValueType;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteStructure;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
 
 /**
@@ -86,7 +86,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 
 						
 					   coleccionstatica.getMetamodelGrammar().add(M);
-					   ArrayList<CompleteStructure> MetaColumnas=procesaColumnas(catalogo,tabla,M);
+					   ArrayList<CompleteElementType> MetaColumnas=procesaColumnas(catalogo,tabla,M);
 					   procesaColumnasInstancia(catalogo,tabla,MetaColumnas,M);
 					}
 			rs.close();
@@ -104,7 +104,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 	 * @param metaColumnas 
 	 * @param Documento 
 	 */
-	protected void procesaColumnasInstancia(String catalogo, String tabla, ArrayList<CompleteStructure> metaColumnas, CompleteGrammar Documento) {
+	protected void procesaColumnasInstancia(String catalogo, String tabla, ArrayList<CompleteElementType> metaColumnas, CompleteGrammar Documento) {
 		try {
 			ResultSet rs=MySQL.RunQuerrySELECT("SELECT * FROM "+ tabla +";");
 			if (rs!=null) 
@@ -114,7 +114,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 					String ID=rs.getString(1);
 					
 					CompleteDocuments DocumentosC=new CompleteDocuments(coleccionstatica,"Columna","");
-					for (CompleteStructure completeElementType : metaColumnas) {
+					for (CompleteElementType completeElementType : metaColumnas) {
 						Object O=null;
 						try {
 							O=rs.getObject(completeElementType.getName());
@@ -161,7 +161,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 	 * @param dato
 	 * @return
 	 */
-	private CompleteElement generaMetavalue(CompleteStructure completeElementType, String dato) {
+	private CompleteElement generaMetavalue(CompleteElementType completeElementType, String dato) {
 		if (completeElementType instanceof CompleteTextElementType)
 			if (isDate((CompleteTextElementType)completeElementType))
 				return generateDate((CompleteTextElementType)completeElementType, dato);
@@ -292,8 +292,8 @@ public class CollectionSQL implements InterfaceSQLparser {
 	 * @param tabla
 	 * @param padre
 	 */
-	protected ArrayList<CompleteStructure> procesaColumnas(String catalogo, String tabla, CompleteGrammar padre) {
-		ArrayList<CompleteStructure> Salida =new ArrayList<CompleteStructure>();
+	protected ArrayList<CompleteElementType> procesaColumnas(String catalogo, String tabla, CompleteGrammar padre) {
+		ArrayList<CompleteElementType> Salida =new ArrayList<CompleteElementType>();
 		try {
 			HashMap<String,KeyElement> Keys=new HashMap<String,KeyElement>();
 			
@@ -323,7 +323,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 					   String VistaOV=new String(NameConstantsSQL.SQL);
 					   
 					   
-					   CompleteStructure M=generaMeta(nombreColumna,tipoColumna,padre,VistaOV,tabla,numberasoc);
+					   CompleteElementType M=generaMeta(nombreColumna,tipoColumna,padre,VistaOV,tabla,numberasoc);
 					   
 					  
 						CompleteOperationalValueType Valor=new CompleteOperationalValueType(NameConstantsSQL.SQLType,NameConstantsSQL.COLUMNA,VistaOV);
@@ -419,7 +419,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 		
 	}
 
-	private CompleteStructure generaMeta(String nombreColumna, String tipoColumna, CompleteGrammar padre, String vistaOV,String tabla, String numberasoc) {
+	private CompleteElementType generaMeta(String nombreColumna, String tipoColumna, CompleteGrammar padre, String vistaOV,String tabla, String numberasoc) {
 		
 		
 		
@@ -562,7 +562,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 				}
 		}
 		
-		CompleteStructure Salida = new CompleteStructure(nombreColumna, padre);
+		CompleteElementType Salida = new CompleteElementType(nombreColumna, padre);
 		
 		CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,tipoColumna.toString(),vistaOV);
 		Salida.getShows().add(ValorResult);
