@@ -453,7 +453,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 						}
 						
 						}
-				 
+				Salida.setClassOfIterator(Salida);
 				 
 				return Salida;
 			}
@@ -474,7 +474,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 				
 				CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,valornumerico.toString(),vistaOV);
 				Salida.getShows().add(ValorResult);
-				
+				Salida.setClassOfIterator(Salida);
 				
 				return Salida;
 				}
@@ -509,7 +509,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 					
 					}
 					
-					
+					Salida.setClassOfIterator(Salida);
 					
 					
 					return Salida;
@@ -529,6 +529,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 				
 				CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,valornumerico.toString(),vistaOV);
 				Salida.getShows().add(ValorResult);
+				Salida.setClassOfIterator(Salida);
 				
 				return Salida;
 				}
@@ -556,7 +557,7 @@ public class CollectionSQL implements InterfaceSQLparser {
 
 				CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,valornumerico.toString(),vistaOV);
 				Salida.getShows().add(ValorResult);
-				
+				Salida.setClassOfIterator(Salida);
 
 				return Salida;
 				}
@@ -566,6 +567,8 @@ public class CollectionSQL implements InterfaceSQLparser {
 		
 		CompleteOperationalValueType ValorResult=new CompleteOperationalValueType(NameConstantsSQL.TYPECOLUMN,tipoColumna.toString(),vistaOV);
 		Salida.getShows().add(ValorResult);
+		
+		Salida.setClassOfIterator(Salida);
 		
 		return Salida; 
 	}
